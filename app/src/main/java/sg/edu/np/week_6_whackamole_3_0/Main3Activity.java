@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
+
 public class Main3Activity extends AppCompatActivity {
     /* Hint:
         1. This displays the available levels from 1 to 10 to the user.
@@ -27,6 +29,9 @@ public class Main3Activity extends AppCompatActivity {
      */
     private static final String FILENAME = "Main3Activity.java";
     private static final String TAG = "Whack-A-Mole3.0!";
+    private Button back;
+    ArrayList<Integer> levels, scores;
+    MyDBHandler dbHandler = new MyDBHandler(this,null,null,1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,24 @@ public class Main3Activity extends AppCompatActivity {
 
         Log.v(TAG, FILENAME + ": Show level for User: "+ userName);
          */
+        Intent receivingEnd = getIntent();
+        String username = receivingEnd.getStringExtra("username");
+        UserData userData = dbHandler.findUser(username);
+        RecyclerView recyclerView = findViewById(R.id.recyclerLevel);
+        CustomScoreAdaptor cAdapter = new CustomScoreAdaptor(userData,this);
+        LinearLayoutManager cLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(cLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(cAdapter);
+        back = (Button) findViewById(R.id.backButton);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        Log.v(TAG, FILENAME + ": Show level for User: "+ username);
     }
 
     @Override

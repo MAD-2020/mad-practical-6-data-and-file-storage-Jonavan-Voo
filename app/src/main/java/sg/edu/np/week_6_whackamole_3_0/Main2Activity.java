@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class Main2Activity extends AppCompatActivity {
 
     private static final String FILENAME = "Main2Activity.java";
     private static final String TAG = "Whack-A-Mole3.0!";
+    MyDBHandler dbHandler = new MyDBHandler(this,null,null,1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,49 @@ public class Main2Activity extends AppCompatActivity {
             Log.v(TAG, FILENAME + ": User already exist during new user creation!");
 
          */
+        Button create = findViewById(R.id.createButton);
+        create.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                EditText etCreateUsername = findViewById(R.id.usernameCreate);
+                EditText etCreatePassword = findViewById(R.id.passwordCreate);
+                if(etCreateUsername.getText().toString().isEmpty() || etCreatePassword.getText().toString().isEmpty()){
+                    Toast.makeText(Main2Activity.this,"Invalid username/password",Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.v(TAG, FILENAME + ": Creation of user info: " + etCreateUsername.getText().toString() + "|" + etCreatePassword.getText().toString());
+                    UserData userData = dbHandler.findUser(etCreateUsername.getText().toString());
+                    if (userData == null) {
+                        ArrayList<Integer> levels = new ArrayList<>();
+                        ArrayList<Integer> scores = new ArrayList<>();
+                        UserData dbUserData = new UserData();
+                        dbUserData.setMyUserName(etCreateUsername.getText().toString());
+                        dbUserData.setMyPassword(etCreatePassword.getText().toString());
+                        for (int i = 1; i <= 10; i++) {
+                            levels.add(i);
+                            scores.add(0);
+                        }
+                        dbUserData.setLevels(levels);
+                        dbUserData.setScores(scores);
+                        dbHandler.addUser(dbUserData);
+                        Toast.makeText(Main2Activity.this, "New user created successfully!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Main2Activity.this, MainActivity.class);
+                        startActivity(intent);
+                        Log.v(TAG, FILENAME + ": New user created successfully!");
+                    } else {
+                        Toast.makeText(Main2Activity.this, "User already exists!", Toast.LENGTH_SHORT).show();
+                        Log.v(TAG, FILENAME + ": User already exist during new user creation!");
+                    }
+                }
+            }
+        });
+        Button cancel = findViewById(R.id.cancelButton);
+        cancel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(Main2Activity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     protected void onStop() {
